@@ -4,7 +4,8 @@
   "description": "Proyecto de la asignatura de Arquitectura SS del máster de Cloud, Datos y Gestión TI de la universidad de Sevilla",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js"
+
   },
   "repository": {
     "type": "git",

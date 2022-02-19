@@ -1,5 +1,6 @@
-import mongoose from 'mongoose';
-const { Schema } = mongoose;
+'use strict'
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
 const StageSchema = new Schema({
   title: { type: String, required: true },
@@ -7,7 +8,7 @@ const StageSchema = new Schema({
   price: { type: Number, required: true, min: 0 }
 });
 
-export default {
+const TripSchema = new Schema({
   Trip: new Schema({
     ticker: { type: String, required: true },
     title: { type: String, required: true },
@@ -24,4 +25,8 @@ export default {
     manager: { type: Schema.Types.ObjectId, ref: 'Actor' },
     isDeleted: { type: Boolean, default: false}
   })
-};
+});
+
+
+module.exports = mongoose.model('Trips', TripSchema);
+module.exports = mongoose.model('Stages', StageSchema);

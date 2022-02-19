@@ -1,7 +1,8 @@
-import mongoose from 'mongoose';
-const { Schema } = mongoose;
+'use strict'
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
-export default {
+const ActorSchema = new Schema({
   Actor: new Schema({
     name: { type: String, required: true },
     surname: { type: String, required: true },
@@ -14,4 +15,7 @@ export default {
     role: { type: String, required: true, enum: ['EXPLORER', 'ADMINISTRATOR', 'MANAGER'] },
     isDeleted: { type: Boolean, default: false}
   })
-};
+});
+
+
+module.exports = mongoose.model('Actors', ActorSchema)

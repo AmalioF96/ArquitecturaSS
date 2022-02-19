@@ -1,9 +1,12 @@
-import mongoose from 'mongoose';
-const { Schema } = mongoose;
+'use strict'
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
-export default {
+const ConfigSchema = new Schema({
   Config: new Schema({
     finderCache: { type: Number, min: 1, max: 24 },
     finderResults: { type: Number, min: 1, max: 100 },
   })
-};
+});
+
+module.exports = mongoose.model('Configs', ConfigSchema);

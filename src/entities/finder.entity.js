@@ -1,7 +1,8 @@
-import mongoose from 'mongoose';
-const { Schema } = mongoose;
+'use strict'
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
-export default {
+const FinderSchema = new Schema({
   Finder: new Schema({
     keyword: String,
     dateStart: Date,
@@ -11,4 +12,6 @@ export default {
     explorer: { type: Schema.Types.ObjectId, ref: 'Actor' },
     trips: { type: [Schema.Types.ObjectId], ref: 'Trip' },
   })
-};
+});
+
+module.exports = mongoose.model('Finders', FinderSchema);
