@@ -22,9 +22,11 @@ exports.list_all_actors = function (req, res) {
 
 exports.create_an_actor = function (req, res) {
   const newActor = new Actor(req.body)
+  console.info(req.body)
+  console.info(newActor)
   // If new_actor is a customer, validated = true;
   // If new_actor is a clerk, validated = false;
-  if ((newActor.role.includes('CLERK'))) {
+  if ((newActor.role.includes('ADMINISTRATOR'))) {
     newActor.validated = false
   } else {
     newActor.validated = true

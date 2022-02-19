@@ -3,7 +3,6 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const ApplicationSchema = new Schema({
-  Application: new Schema({
     moment: {type: Date, required: true, default: Date.now },
     status: { type: String, required: true, enum: ['PENDING', 'ACCEPTED', 'REJECTED', 'DUE'], default: 'PENDING' },
     rejectedReason: String,
@@ -12,7 +11,6 @@ const ApplicationSchema = new Schema({
     comment: [String],
     explorer: { type: Schema.Types.ObjectId, ref: 'Actor' },
     trip: { type: Schema.Types.ObjectId, ref: 'Trip' },
-  })
 });
 
 

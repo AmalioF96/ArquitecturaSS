@@ -3,7 +3,6 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const ActorSchema = new Schema({
-  Actor: new Schema({
     name: { type: String, required: true },
     surname: { type: String, required: true },
     email: { type: String, required: true, unique: true, index: true },
@@ -14,7 +13,6 @@ const ActorSchema = new Schema({
     language: { type: String, required: true, enum: ['EN', 'ES'], default: 'ES' },
     role: { type: String, required: true, enum: ['EXPLORER', 'ADMINISTRATOR', 'MANAGER'] },
     isDeleted: { type: Boolean, default: false}
-  })
 });
 
 

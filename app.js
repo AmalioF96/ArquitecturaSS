@@ -31,7 +31,7 @@ const mongoDBHostname = process.env.mongoDBHostname || 'localhost'
 const mongoDBPort = process.env.mongoDBPort || '27017'
 const mongoDBName = process.env.mongoDBName || 'ACME-Explorer'
 
-const mongoDBURI = 'mongodb://' + mongoDBCredentials + mongoDBHostname + ':' + mongoDBPort + '/' + mongoDBName
+const mongoDBURI = 'mongodb://' + mongoDBHostname + ':' + mongoDBPort + '/' + mongoDBName
 
 // mongoose.connect(mongoDBURI)
 mongoose.connect(mongoDBURI, {

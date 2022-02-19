@@ -9,7 +9,6 @@ const StageSchema = new Schema({
 });
 
 const TripSchema = new Schema({
-  Trip: new Schema({
     ticker: { type: String, required: true },
     title: { type: String, required: true },
     description: { type: String, required: true },
@@ -24,7 +23,6 @@ const TripSchema = new Schema({
     stages: { type: [StageSchema], required: true },
     manager: { type: Schema.Types.ObjectId, ref: 'Actor' },
     isDeleted: { type: Boolean, default: false}
-  })
 });
 
 
