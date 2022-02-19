@@ -6,7 +6,7 @@ const Finder = mongoose.model("Finders");
 exports.list_all_finders = function (req, res) {
   Finder.find({}, function (err, finders) {
     if (err) {
-      res.send(err);
+      res.status(500).send(err);
     } else {
       res.json(finders);
     }
@@ -24,7 +24,11 @@ exports.create_an_finder = function (req, res) {
 
   newFinder.save(function (err, finder) {
     if (err) {
-      res.send(err);
+      if (err.name === "ValidationError") {
+        res.status(422).send(err);
+      } else {
+        res.status(500).send(err);
+      }
     } else {
       res.json(finder);
     }
@@ -34,7 +38,7 @@ exports.create_an_finder = function (req, res) {
 exports.read_an_finder = function (req, res) {
   Finder.findById(req.params.finderId, function (err, finder) {
     if (err) {
-      res.send(err);
+      res.status(500).send(err);
     } else {
       res.json(finder);
     }
@@ -48,7 +52,11 @@ exports.update_an_finder = function (req, res) {
     { new: true },
     function (err, finder) {
       if (err) {
-        res.send(err);
+        if (err.name === "ValidationError") {
+          res.status(422).send(err);
+        } else {
+          res.status(500).send(err);
+        }
       } else {
         res.json(finder);
       }
