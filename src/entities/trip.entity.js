@@ -13,10 +13,10 @@ const TripSchema = new Schema({
     title: { type: String, required: true },
     description: { type: String, required: true },
     price: Number,
-    dateStart: { type: Date, required: true },
-    dateEnd: { type: Date, required: true },
+    dateStart: { type: Date, required: true, validate:[dateStartValidator, 'The start date must be in the future']  },
+    dateEnd: { type: Date, required: true, validate:[dateEndValidator, 'The start date must be before the end date'] },
     isCancelled: { type: Boolean, required: true, default: false },
-    reasonCancel: String,
+    reasonCancel: { type: String },
     draftMode: { type: Boolean, required: true },
     pictures: [String],
     requirements: [String],
@@ -25,6 +25,14 @@ const TripSchema = new Schema({
     isDeleted: { type: Boolean, default: false}
 });
 
+function dateStartValidator(value) {
+  const actualDate = new Date
+  return actualDate <= value;
+}
+
+function dateEndValidator(value) {
+  return this.dateStart <= value;
+}
 
 module.exports = mongoose.model('Trips', TripSchema);
 module.exports = mongoose.model('Stages', StageSchema);

@@ -16,9 +16,10 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
 const routesActors = require('./src/routes/actor.routes')
+const routesTrips = require('./src/routes/trip.routes')
 
 routesActors(app)
-//routesItems(app)
+routesTrips(app)
 //routesOrders(app)
 //routesStorage(app)
 
