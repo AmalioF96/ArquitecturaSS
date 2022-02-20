@@ -41,33 +41,25 @@ exports.list_all_actors = function (req, res) {
 // }
 
 exports.create_an_actor = function (req, res) {
-  const newActor = new Actor(req.body)
-
-  bcrypt.genSalt(10, function(err, salt) {
-    if (err){
-      res.status(500).send(err)
-    } 
-
-    bcrypt.hash(newActor.password, salt, function(err, hash) {
-    if (err){
-      res.status(500).send(err)
-    } else {
-      newActor.password = hash;
-      }
-    })});
-    console.info(hash)
-    console.info(newActor.password)
-  newActor.save(function (err, actor) {
+  bcrypt.genSalt(6, function(err, salt) {
+    var newActor = new Actor(req.body)
     if (err) {
-      if (err.name === 'ValidationError') {
-        res.status(422).send(err)
-      } else {
-        console.info(err)
-        res.status(500).send(err)
-      }
-    } else {
-      res.json(actor)
+      res.status(500).send(err)
     }
+    bcrypt.hash(req.body.password, salt, function(err, hash) {
+      newActor.password = hash
+      newActor.save(function (err, actor) {
+        if (err) {
+          if (err.name === 'ValidationError') {
+            res.status(422).send(err)
+          } else {
+            res.status(500).send(err)
+          }
+        } else {
+          res.json(actor)
+        }
+      })
+    })
   })
 }
 
@@ -82,10 +74,44 @@ exports.read_an_actor = function (req, res) {
   })
 }
 
+
+function compare(encrypted) {
+  bcrypt.compare('aboveusedpassword', encrypted, (err, res) => {
+      // res == true or res == false
+      console.log('Compared result', res, hash) 
+  })
+}
+
 exports.update_an_actor = function (req, res) {
   // Check that the user is the proper actor and if not: res.status(403);
   // "an access token is valid, but requires more privileges"
-  Actor.findOneAndUpdate({ _id: req.params.actorId }, req.body, { new: true }, function (err, actor) {
+
+  const newPassword = req.body.password
+  console.log("newPass", newPassword)
+  const actorBody = req.body
+
+  var salt = bcrypt.genSaltSync(6);
+  bcrypt.hash(newPassword, salt, (err, res) => {
+    console.log('hash', res)
+    var hash = res
+    bcrypt.compare(newPassword, hash, (err, res) => {
+      console.log('Compared result', res, hash) 
+      if (res==true) {
+        //Se ha modificado la contraseña
+        console.log("La contraseña ha cambiado")
+        console.log("Contra antes", actorBody.password)
+        req.body.password = hash
+        console.log("Contra después", actorBody.password)
+      } else {
+        //No se ha modificado la contraseña
+        console.log("La contraseña no ha cambiado")
+      }
+    })
+  }); 
+
+
+
+  Actor.findOneAndUpdate({ _id: req.params.actorId }, actorBody, { new: true }, function (err, actor) {
     if (err) {
       if (err.name === 'ValidationError') {
         res.status(422).send(err)
