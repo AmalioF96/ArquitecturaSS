@@ -8,7 +8,7 @@ exports.list_all_finders = function (req, res) {
     if (err) {
       res.status(500).send(err);
     } else {
-      res.json(finders);
+      res.status(200).json(finders);
     }
   });
 };
@@ -30,7 +30,7 @@ exports.create_an_finder = function (req, res) {
         res.status(500).send(err);
       }
     } else {
-      res.json(finder);
+      res.status(201).json(finder);
     }
   });
 };
@@ -40,7 +40,7 @@ exports.read_an_finder = function (req, res) {
     if (err) {
       res.status(500).send(err);
     } else {
-      res.json(finder);
+      res.status(200).json(finder);
     }
   });
 };
@@ -58,12 +58,13 @@ exports.update_an_finder = function (req, res) {
           res.status(500).send(err);
         }
       } else {
-        res.json(finder);
+        res.status(200).json(finder);
       }
     }
   );
 };
 
 exports.delete_an_finder = function (req, res) {
+  //res.status(204)
   res.send("ERROR");
 };
