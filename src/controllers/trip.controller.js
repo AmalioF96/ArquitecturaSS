@@ -7,7 +7,7 @@ const customAlphabet = require('nanoid').customAlphabet
 const rand_letters = customAlphabet('ABCDEFGHIJKLMNPQRSTUVWXYZ', 4)
 
 exports.list_all_trips = function (req, res) {
-  Trip.find({ isDeleted: false }, function (err, trips) {
+  Trip.find({ isDeleted: false, draftMode: false }, function (err, trips) {
     if (err) {
       res.send(err)
     } else {
@@ -17,7 +17,7 @@ exports.list_all_trips = function (req, res) {
 }
 
 exports.list_my_trips = function (req, res) {
-  Trip.find({}, function (err, trips) {
+  Trip.find({ isDeleted: false }, function (err, trips) {
     if (err) {
       res.send(err)
     } else {
@@ -28,10 +28,9 @@ exports.list_my_trips = function (req, res) {
 
 exports.create_a_trip = function (req, res) {
   const newTrip = new Trip(req.body)
-  newTrip.ticker = tickerGenerator()
-  newTrip.price = priceGenerator(newTrip.stages)
   newTrip.save(function (err, trip) {
     if (err) {
+      console.log(err)
       res.send(err)
     } else {
       res.json(trip)
@@ -39,26 +38,9 @@ exports.create_a_trip = function (req, res) {
   })
 }
 
-function tickerGenerator() {
-  const date = new Date
-  const year = date.getFullYear().toString().substr(-2)
-  const res = year + (date.getMonth() + 1).toString() + date.getDate().toString() + "-" + rand_letters()
-  return res
-}
-
-function priceGenerator(stages) {
-  var res = 0;
-
-  stages.forEach(st => {
-    res = st.price + res;
-  });
-
-  return res;
-}
-
 exports.search_trips = function (req, res) {
   const query = {}
-  query.title = req.query.tripName != null ? req.query.tripName : /.*/
+  query.text = req.query.text != null ? req.query.text : /.*/
 
   if (req.query.deleted) {
     query.deleted = req.query.deleted
@@ -71,18 +53,15 @@ exports.search_trips = function (req, res) {
   if (req.query.pageSize) {
     limit = parseInt(req.query.pageSize)
   }
-  let sort = ''
-  if (req.query.reverse === 'true') {
-    sort = '-'
-  }
-  if (req.query.sortedBy) {
-    sort += req.query.sortedBy
-  }
 
-  console.log('Query: ' + query + ' Skip:' + skip + ' Limit:' + limit + ' Sort:' + sort)
+  console.log('Query: ' + query + ' Skip:' + skip + ' Limit:' + limit)
+  // db.items.find(
+  //  {$text: {$search: "samsung"}},
+  //  { score: { $meta: "textScore" } }
+  //  ).sort( { score: { $meta: "textScore" } } )
 
-  Trip.find(query)
-    .sort(sort)
+  Trip.find({ $text: { $search: query.text }, isDeleted: query.deleted }, { score: { $meta: "textScore" } })
+    .sort({ score: { $meta: "textScore" } })
     .skip(skip)
     .limit(limit)
     .lean()
@@ -99,97 +78,76 @@ exports.search_trips = function (req, res) {
 
 exports.read_a_trip = function (req, res) {
   Trip.findById(req.params.tripId, function (err, trip) {
-    if (!trip) {
+    if (err) {
+      res.send(err)
+    } else if (!trip) {
       res.status(404).send('Non existing trip')
-    } else {
-      if (err) {
-        res.send(err)
-      } else {
-        res.json(trip)
-      }
+    }
+    else {
+      res.json(trip)
     }
   })
 }
 
 exports.update_a_trip = function (req, res) {
-  Trip.findById(req.params.tripId, function (err, trip) {
-    if (!trip) {
-      res.status(404).send('Non existing trip')
-    } else {
-      if (err) {
-        res.send(err)
+  Trip.findOneAndUpdate({ _id: req.params.tripId }, req.body, { new: true }, function (err, trip) {
+    if (err) {
+      if (err.name === 'ValidationError') {
+        res.status(422).send(err)
       } else {
-        if (!trip.draftMode) {
-          res.status(403).send('You cannot update a published trip')
-        } else {
-          Trip.findOneAndUpdate({ _id: req.params.tripId, draftMode: true }, req.body, { new: true }, function (err, trip) {
-            if (err) {
-              if (err.name === 'ValidationError') {
-                res.status(422).send(err)
-              } else {
-                res.status(500).send(err)
-              }
-            } else {
-              res.json(trip)
-            }
-          })
-        }
+        res.status(500).send(err)
       }
+    } else if (!trip) {
+      res.status(404).send('Non existing trip')
+    } else if (!trip.draftMode) {
+      res.status(403).send('You cannot update a published trip')
+    }
+    else {
+      res.json(trip)
     }
   })
-    
+
 }
 
 exports.cancel_a_trip = function (req, res) {
   const reason = req.body.reasonCancel
-  if (!reason.replace(/\s/g, "")) {
-    res.status(422).send('A cancellation reason is needed')
-  } else {
-    // Need no application accepted validation
-    Trip.findOneAndUpdate({ _id: req.params.tripId, dateStart: { $gt: Date.now() } }, { isCancelled: true, reasonCancel: reason }, { new: true }, function (err, trip) {
-      if (!trip) {
-        res.status(404).send('Non existing trip')
+  // Need no application accepted validation
+  Trip.findOneAndUpdate({ _id: req.params.tripId }, { isCancelled: true, reasonCancel: reason }, { new: true }, function (err, trip) {
+    if (err) {
+      if (err.name === 'ValidationError') {
+        res.status(422).send(err)
+      } else if (err === 'A cancellation reason is needed') {
+        res.status(403).send(err)
       } else {
-        if (err) {
-          if (err.name === 'ValidationError') {
-            res.status(422).send(err)
-          } else {
-            res.status(500).send(err)
-          }
-        } else {
-          res.json(trip)
-        }
+        res.status(500).send(err)
       }
-    })
-  }
+    } else if (!trip) {
+      res.status(404).send('Non existing trip')
+    } else if (!(new Date(trip.dateStart) > new Date)) {
+      res.status(403).send('Cannot cancel already started trips')
+    } else {
+      res.json(trip)
+    }
+  })
+
 }
 
 exports.delete_a_trip = function (req, res) {
-  Trip.findById(req.params.tripId, function (err, trip) {
-    if (!trip) {
-      res.status(404).send('Non existing trip')
-    } else {
-      if (err) {
-        res.send(err)
+  Trip.findOneAndUpdate({ _id: req.params.tripId }, { isDeleted: true }, { new: true }, function (err, trip) {
+    if (err) {
+      if (err.name === 'ValidationError') {
+        res.status(422).send(err)
       } else {
-        console.log(trip)
-        if (!trip.draftMode) {
-          res.status(403).send('You cannot delete a published trip')
-        } else {
-          Trip.findOneAndUpdate({ _id: req.params.tripId, draftMode: true }, { isDeleted: true }, { new: true }, function (err, trip) {
-            if (err) {
-              if (err.name === 'ValidationError') {
-                res.status(422).send(err)
-              } else {
-                res.status(500).send(err)
-              }
-            } else {
-              res.json(trip)
-            }
-          })
-        }
+        res.status(500).send(err)
       }
+    } else if (!trip) {
+      res.status(404).send('Non existing trip')
+    } else if (!trip.draftMode) {
+      res.status(403).send('You cannot delete a published trip')
+    } else {
+      res.json(trip)
     }
+
   })
 }
 
