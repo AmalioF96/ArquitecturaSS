@@ -31,6 +31,9 @@ module.exports = function (app) {
   app.route('/v1/actors/:actorId')
     .get(actors.read_an_actor)
     .put(actors.update_an_actor)
-    // .delete(actors.delete_an_actor)
+    .delete(actors.delete_an_actor)
+
+  app.route('/v1/actors/:actorId/ban')
+    .put(actors.ban_an_actor)
 
 }

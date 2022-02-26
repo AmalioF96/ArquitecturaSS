@@ -145,6 +145,8 @@ function compare(encrypted) {
 exports.update_an_actor = function (req, res) {
   // Check that the user is the proper actor and if not: res.status(403);
   // "an access token is valid, but requires more privileges"
+
+
   Actor.findOneAndUpdate({ _id: req.params.actorId }, req.body, { new: true }, function (err, actor) {
     if (err) {
       if (err.name === 'ValidationError') {
@@ -159,6 +161,40 @@ exports.update_an_actor = function (req, res) {
 }
 
 exports.delete_an_actor = function (req, res) {
-    res.send('ERROR');
+  Actor.findOneAndUpdate({ _id: req.params.actorId }, { isDeleted: true , name: 'XXXX', surname: 'XXXX', email: 'XXXX', phone: 'XXXX'}, { new: true }, function (err, actor) {
+    console.log(actor)
+    if (err) {
+      console.log(err)
+      if (err.name === 'ValidationError') {
+        res.status(422).send(err)
+      } else {
+        res.status(500).send(err)
+      }
+    } else if (!actor) {
+      res.status(404).send('Not existing actor')
+    } else {
+      res.json(actor)
+    }
+
+    })
   }
 
+  exports.ban_an_actor = function (req, res) {
+    Actor.findOneAndUpdate({ _id: req.params.actorId }, { isBan: true}, { new: true }, function (err, actor) {
+      if (err) {
+        console.log(err)
+        if (err.name === 'ValidationError') {
+          res.status(422).send(err)
+        } else {
+          res.status(500).send(err)
+        }
+      } else if (!actor) {
+        res.status(404).send('Not existing actor')
+      } else {
+        res.json(actor)
+      }
+  
+      })
+    }
+  
+  
