@@ -15,13 +15,14 @@ module.exports = function (app) {
         .patch(trips.cancel_a_trip)
         .delete(trips.delete_a_trip)
 
-    app.route('/v1/stages')
-        .post(trips.create_a_stage)
+    // Temporarily
+//    app.route('/v1/stages')
+//        .post(trips.create_a_stage)
 
-    app.route('/v1/stages/:stageId')
-        .get(trips.read_a_stage)
+//    app.route('/v1/stages/:stageId')
+//        .get(trips.read_a_stage)
 
-    app.route('/v1/mytrips’')
-        .get(trips.list_my_trips)
+//    app.route('/v1/mytrips’')
+//        .get(trips.list_my_trips)
 
 }
