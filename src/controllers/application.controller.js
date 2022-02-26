@@ -46,6 +46,12 @@ exports.update_an_application = function (req, res) {
 }
 
 exports.delete_an_application = function (req, res) {
-    res.send('ERROR');
-  }
+  Application.findOneAndUpdate({ _id: req.params.applicationId }, { isDeleted: true }, { new: true }, function (err, application) {
+    if (err) {
+      res.status(500).send(err)
+    } else {
+      res.status(204).send()
+    }
+  })
+}
 
