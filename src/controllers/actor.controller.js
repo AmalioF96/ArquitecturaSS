@@ -149,6 +149,7 @@ exports.update_an_actor = function (req, res) {
 
   Actor.findOneAndUpdate({ _id: req.params.actorId }, req.body, { new: true }, function (err, actor) {
     if (err) {
+      console.log(err)
       if (err.name === 'ValidationError') {
         res.status(422).send(err)
       } else {
@@ -180,21 +181,59 @@ exports.delete_an_actor = function (req, res) {
   }
 
   exports.ban_an_actor = function (req, res) {
-    Actor.findOneAndUpdate({ _id: req.params.actorId }, { isBan: true}, { new: true }, function (err, actor) {
+
+
+    Actor.findById(req.params.actorId, function (err, oldActor) {
       if (err) {
-        console.log(err)
-        if (err.name === 'ValidationError') {
-          res.status(422).send(err)
-        } else {
-          res.status(500).send(err)
-        }
-      } else if (!actor) {
-        res.status(404).send('Not existing actor')
+        res.send(err)
       } else {
-        res.json(actor)
-      }
-  
-      })
+        if (oldActor.isBan==true){
+          res.status(500).send("Can't ban an actor already banned.")
+        } else {
+        Actor.findOneAndUpdate({ _id: req.params.actorId }, { isBan: true }, { new: true }, function (err, actor) {
+          if (err) {
+            console.log(err)
+            if (err.name === 'ValidationError') {
+              res.status(422).send(err)
+            } else {
+              res.status(500).send(err)
+            }
+          } else if (!actor) {
+            res.status(404).send('Not existing actor')
+          } else {
+            res.json(actor)
+          }
+      
+          })
+      }}
+    })
     }
   
+    exports.unban_an_actor = function (req, res) {
+
   
+      Actor.findById(req.params.actorId, function (err, oldActor) {
+        if (err) {
+          res.send(err)
+        } else {
+          if (oldActor.isBan!=true){
+            res.status(500).send("Can't unban an actor unbanned.")
+          } else {
+          Actor.findOneAndUpdate({ _id: req.params.actorId }, { isBan: false }, { new: true }, function (err, actor) {
+            if (err) {
+              console.log(err)
+              if (err.name === 'ValidationError') {
+                res.status(422).send(err)
+              } else {
+                res.status(500).send(err)
+              }
+            } else if (!actor) {
+              res.status(404).send('Not existing actor')
+            } else {
+              res.json(actor)
+            }
+        
+            })
+        }}
+      })
+      }
