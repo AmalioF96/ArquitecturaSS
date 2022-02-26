@@ -55,10 +55,6 @@ exports.search_trips = function (req, res) {
   }
 
   console.log('Query: ' + query + ' Skip:' + skip + ' Limit:' + limit)
-  // db.items.find(
-  //  {$text: {$search: "samsung"}},
-  //  { score: { $meta: "textScore" } }
-  //  ).sort( { score: { $meta: "textScore" } } )
 
   Trip.find({ $text: { $search: query.text }, isDeleted: query.deleted }, { score: { $meta: "textScore" } })
     .sort({ score: { $meta: "textScore" } })
