@@ -5,7 +5,6 @@
   "main": "index.js",
   "scripts": {
     "start": "node app.js"
-
   },
   "repository": {
     "type": "git",
@@ -18,7 +17,9 @@
   },
   "homepage": "https://github.com/AmalioF96/ArquitecturaSS#readme",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "express": "^4.17.2",
-    "mongoose": "^6.2.2"
+    "mongoose": "^6.2.2",
+    "nanoid": "^3.3.1"
   }
 }
