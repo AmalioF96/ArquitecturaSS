@@ -157,3 +157,54 @@ exports.trip_statistics = function (req, res) {
     }
   })
 }
+
+const Finder = mongoose.model('Finders')
+
+exports.finder_top_keyword = function (req, res) {
+  Finder.aggregate([
+    {
+      '$group': {
+        '_id': '$keyword', 
+        'mycount': {
+          '$sum': 1
+        }
+      }
+    }, {
+      '$sort': {
+        'mycount': -1
+      }
+    }, {
+      '$limit': 10
+    }
+  ]
+    ,function(err,finders){
+    if (err) {
+      res.status(500).send(err)
+    } else {
+      res.status(200).json(finders)
+    }
+  })
+}
+
+exports.finder_avg_prices = function (req, res) {
+  Finder.aggregate([
+    {
+      '$group': {
+        '_id': null, 
+        'avgMinPrice': {
+          '$avg': '$priceMin'
+        }, 
+        'avgMaxPrice': {
+          '$avg': '$priceMax'
+        }
+      }
+    }
+  ]
+    ,function(err,finders){
+    if (err) {
+      res.status(500).send(err)
+    } else {
+      res.status(200).json(finders)
+    }
+  })
+}
