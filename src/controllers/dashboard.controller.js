@@ -158,6 +158,41 @@ exports.trip_statistics = function (req, res) {
   })
 }
 
+exports.trips_per_manager = function (req, res) {
+  Trip.aggregate([
+    {
+      '$group': {
+        '_id': '$manager', 
+        'count': {
+          '$sum': 1
+        }}}
+        , {
+          '$group': {
+            '_id': 'Trips per manager statistics', 
+            'mean': {
+              '$avg': '$count'
+            }, 
+            'min': {
+              '$min': '$count'
+            }, 
+            'max': {
+              '$max': '$count'
+            }, 
+            'stand_desv': {
+              '$stdDevPop': '$count' 
+            }
+          }
+        }
+  ], function (err, data) {
+    if (err) {
+      res.send(err)
+    } else {
+      res.json(data)
+    }
+  })
+}
+
+
 const Finder = mongoose.model('Finders')
 
 exports.finder_top_keyword = function (req, res) {
