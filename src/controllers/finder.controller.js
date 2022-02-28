@@ -14,13 +14,12 @@ exports.list_all_finders = function (req, res) {
 };
 
 exports.create_an_finder = function (req, res) {
-  const newFinder = new Finder(req.body);
-  console.info(req.body);
-  console.info(newFinder);
+  const newFinder = new Finder({...req.body, searchTime:new Date()});
 
-  /** TODO
-   * Comprobar que el usuario es explorer
-   */
+  //newFinder = {...newFinder, searchTime:new Date()};
+
+  console.info(newFinder);
+  
 
   newFinder.save(function (err, finder) {
     if (err) {
@@ -65,7 +64,7 @@ exports.update_an_finder = function (req, res) {
 };
 
 exports.delete_an_finder = function (req, res) {
-  Finder.findOneAndUpdate({ _id: req.params.finderId }, { isDeleted: true }, { new: true }, function (err, finder) {
+  Finder.deleteOne({ _id: req.params.finderId }, function (err, finder) {
     console.log(finder);
     if (err) {
       if (err.name === 'ValidationError') {
