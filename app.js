@@ -22,12 +22,15 @@ const routesApplications = require('./src/routes/application.routes')
 const routesFinders = require('./src/routes/finder.routes')
 
 const routesDashboard = require('./src/routes/dashboard.routes')
+const routesConfig = require('./src/routes/config.routes')
+
 
 routesActors(app)
 routesTrips(app)
 routesFinders(app)
 routesApplications(app)
 routesDashboard(app)
+routesConfig(app)
 
 //routesOrders(app)
 //routesStorage(app)
