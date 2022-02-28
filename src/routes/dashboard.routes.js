@@ -16,8 +16,8 @@ module.exports = function (app) {
     .route("/v1/dashboard/applicationsPerTrip")
     .get(dashboards.applications_per_trip);
 
-  app.route("/v1/dashboard/trips")
-    .get(dashboards.trip_statistics)
+  app.route("/v1/dashboard/tripsPrices")
+    .get(dashboards.trips_prices)
 
   app.route("/v1/dashboard/tripsPerManager")
     .get(dashboards.trips_per_manager);
