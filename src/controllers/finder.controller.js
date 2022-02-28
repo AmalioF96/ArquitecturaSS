@@ -65,6 +65,19 @@ exports.update_an_finder = function (req, res) {
 };
 
 exports.delete_an_finder = function (req, res) {
-  //res.status(204)
-  res.send("ERROR");
+  Finder.findOneAndUpdate({ _id: req.params.finderId }, { isDeleted: true }, { new: true }, function (err, finder) {
+    console.log(finder);
+    if (err) {
+      if (err.name === 'ValidationError') {
+        res.status(422).send(err)
+      } else {
+        res.status(500).send(err)
+      }
+    } else if (!finder) {
+      res.status(404).send('Non existing finder')
+    } else {
+      res.json(finder)
+    }
+
+  })
 };
