@@ -36,4 +36,7 @@ module.exports = function (app) {
   app.route('/v1/actors/:actorId/ban')
     .put(actors.ban_an_actor)
 
+  app.route('/v1/actors/:actorId/unban')
+    .put(actors.unban_an_actor)
+
 }

@@ -39,23 +39,23 @@ ActorSchema.pre('save', function (callback) {
   
     // console.log("La contraseña se ha modificado?", actor.isModified('password'))
     // if (!actor.isModified('password')) return callback()
-    const actorId = this._conditions._id
-    console.log(this)
-    console.log(this._conditions._id)
-    console.log(actor)
-    console.log(actor.isBan)
-    console.log(this.getQuery())
-    // ActorSchema.findById(this._conditions._id, function (err, oldActor) {
-    //   if (err) {
-    //     res.send(err)
-    //   } else {
-    //     console.log(oldActor)
-    //     // res.json(actor)
-    //   }
-    // })
 
-
-    if (actor.isDeleted != true && actor.isBan != true) {
+    // if (actor.isDeleted != true && actor.isBan != true) {
+    //   bcrypt.genSalt(5, function (err, salt) {
+    //     if (err) return callback(err)
+    
+    //     bcrypt.hash(actor.password, salt, function (err, hash) {
+    //       if (err) return callback(err)
+    //       actor.password = hash
+    //       callback()
+    //     })
+    //   })
+    // } else {
+    //   console.log('Eliminando o baneando usuario')
+    //   callback()
+    // }
+    if (actor.password) {
+      console.log("SE HA MODIFICADO LA CONTRASEÑA")
       bcrypt.genSalt(5, function (err, salt) {
         if (err) return callback(err)
     
@@ -69,6 +69,7 @@ ActorSchema.pre('save', function (callback) {
       console.log('Eliminando o baneando usuario')
       callback()
     }
+
   })
   
   ActorSchema.methods.verifyPassword = function (password, cb) {
