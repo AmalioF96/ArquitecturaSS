@@ -18,6 +18,18 @@ module.exports = function (app) {
     .get(actors.list_all_actors)
     .post(actors.create_an_actor)
 
+  app.route('/v1/actors/admin')
+    .post(actors.create_an_admin)
+  
+  app.route('/v1/actors/explorer')
+    .post(actors.create_an_explorer)
+  
+  app.route('/v1/actors/manager')
+    .post(actors.create_a_manager)
+  
+  
+    
+
   /**
    * Put an actor
    *    RequiredRoles: to be the proper actor
