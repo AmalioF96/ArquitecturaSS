@@ -63,11 +63,9 @@ exports.list_all_actors = function (req, res) {
 // }
 
 
-exports.create_an_actor = function (req, res) {
-  const newActor = new Actor(req.body)
-  // If new_actor is a customer, validated = true;
-  // If new_actor is a clerk, validated = false;
-
+exports.create_an_admin = function (req, res) {
+  var newActor = new Actor(req.body)
+  newActor.role = 'ADMINISTRATOR'
   newActor.save(function (err, actor) {
     if (err) {
       if (err.name === 'ValidationError') {
@@ -80,6 +78,39 @@ exports.create_an_actor = function (req, res) {
     }
   })
 }
+
+exports.create_an_explorer = function (req, res) {
+  var newActor = new Actor(req.body)
+  newActor.role = 'EXPLORER'
+  newActor.save(function (err, actor) {
+    if (err) {
+      if (err.name === 'ValidationError') {
+        res.status(422).send(err)
+      } else {
+        res.status(500).send(err)
+      }
+    } else {
+      res.json(actor)
+    }
+  })
+}
+
+exports.create_a_manager = function (req, res) {
+  var newActor = new Actor(req.body)
+  newActor.role = 'MANAGER'
+  newActor.save(function (err, actor) {
+    if (err) {
+      if (err.name === 'ValidationError') {
+        res.status(422).send(err)
+      } else {
+        res.status(500).send(err)
+      }
+    } else {
+      res.json(actor)
+    }
+  })
+}
+
 
 exports.read_an_actor = function (req, res) {
   Actor.findById(req.params.actorId, function (err, actor) {
