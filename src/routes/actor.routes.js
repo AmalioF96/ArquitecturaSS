@@ -16,7 +16,6 @@ module.exports = function (app) {
   */
   app.route('/v1/actors')
     .get(actors.list_all_actors)
-    .post(actors.create_an_actor)
 
   app.route('/v1/actors/admin')
     .post(actors.create_an_admin)
