@@ -3,6 +3,8 @@
 const mongoose = require('mongoose')
 const Actor = mongoose.model('Actors')
 const bcrypt = require('bcrypt');
+const authController = require('./authController')
+const admin = require('firebase-admin')
 
 exports.list_all_actors = function (req, res) {
   // Check if the role param exist
@@ -17,6 +19,41 @@ exports.list_all_actors = function (req, res) {
       res.send(err)
     } else {
       res.json(actors)
+    }
+  })
+}
+
+
+exports.login_an_actor = async function (req, res) {
+  console.log('starting login an actor')
+  const emailParam = req.query.email
+  const password = req.query.password
+  let customToken
+
+  Actor.findOne({ email: emailParam }, function (err, actor) {
+    if (err) { // No actor found with that email as username
+      res.send(err)
+    } else if (!actor) { // an access token isn’t provided, or is invalid
+      res.status(401)
+      res.json({ message: 'forbidden', error: err })
+    } else {    ///////////////////////////////////////////////////////////////////////////////////
+      // Make sure the password is correct
+      actor.verifyPassword(password, async function (err, isMatch) {
+        if (err) {
+          res.send(err)
+        } else if (!isMatch) { // Password did not match
+          res.status(401) // an access token isn’t provided, or is invalid
+          res.json({ message: 'forbidden', error: err })
+        } else {
+          try {
+            customToken = await admin.auth().createCustomToken(actor.email)
+          } catch (error) {
+            console.log('Error creating custom token:', error)
+          }
+          actor.customToken = customToken
+          res.json(actor)
+        }
+      })
     }
   })
 }
