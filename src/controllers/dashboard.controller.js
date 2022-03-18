@@ -101,55 +101,26 @@ exports.applications_per_trip = function (req, res) {
 /* ---------------TRIP---------------------- */
 const Trip = mongoose.model('Trips')
 
-exports.trip_statistics = function (req, res) {
+exports.trips_prices = function (req, res) {
   Trip.aggregate([
-    {$facet:{
-    "tripsPerManager":[
-      {
-        '$group': {
-          '_id': '$manager', 
-          'count': {
-            '$sum': 1
-          }
-        }
-      }, {
-        '$group': {
-          '_id': "Trips per manager statistics", 
-          'mean': {
-            '$avg': '$count'
-          }, 
-          'min': {
-            '$min': '$count'
-          }, 
-          'max': {
-            '$max': '$count'
-          }, 
-          'stand_desv': {
-            '$stdDevSamp': '$count'
-          }
+    {
+      '$group': {
+        '_id': 'Trips prices statistics', 
+        'mean': {
+          '$avg': '$price'
+        }, 
+        'min': {
+          '$min': '$price'
+        }, 
+        'max': {
+          '$max': '$price'
+        }, 
+        'stand_desv': {
+          '$stdDevSamp': '$price'
         }
       }
-    ],
-    "tripsPrices":[
-      {
-        '$group': {
-          '_id': 'Trips prices statistics', 
-          'mean': {
-            '$avg': '$price'
-          }, 
-          'min': {
-            '$min': '$price'
-          }, 
-          'max': {
-            '$max': '$price'
-          }, 
-          'stand_desv': {
-            '$stdDevSamp': '$price'
-          }
-        }
-      }
-    ]
-  }}], function (err, data) {
+    }
+  ], function (err, data) {
     if (err) {
       res.send(err)
     } else {
@@ -192,7 +163,7 @@ exports.trips_per_manager = function (req, res) {
   })
 }
 
-
+/* ---------------FINDER---------------------- */
 const Finder = mongoose.model('Finders')
 
 exports.finder_top_keyword = function (req, res) {
