@@ -3,9 +3,6 @@
 const mongoose = require('mongoose')
 const Trip = mongoose.model('Trips')
 
-const customAlphabet = require('nanoid').customAlphabet
-const rand_letters = customAlphabet('ABCDEFGHIJKLMNPQRSTUVWXYZ', 4)
-
 exports.list_all_trips = function (req, res) {
   Trip.find({ isDeleted: false, draftMode: false }, function (err, trips) {
     if (err) {
@@ -107,12 +104,13 @@ exports.update_a_trip = function (req, res) {
 
 exports.cancel_a_trip = function (req, res) {
   const reason = req.body.reasonCancel
-  // Need no application accepted validation
   Trip.findOneAndUpdate({ _id: req.params.tripId }, { isCancelled: true, reasonCancel: reason }, { new: true }, function (err, trip) {
     if (err) {
       if (err.name === 'ValidationError') {
         res.status(422).send(err)
       } else if (err === 'A cancellation reason is needed') {
+        res.status(403).send(err)
+      } else if (err === 'Cannot cancel with accepted applications') {
         res.status(403).send(err)
       } else {
         res.status(500).send(err)

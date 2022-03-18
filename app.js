@@ -12,8 +12,23 @@ const Trip = require('./src/entities/trip.entity')
 
 const bodyParser = require('body-parser')
 
+const admin = require('firebase-admin')
+const serviceAccount = require('./acmeexplorer-ce4ff-firebase-adminsdk-8jpv4-9027ad22d4')
+
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
+
+app.use(function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*')
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, idToken') // ojo, que si metemos un parametro propio por la cabecera hay que declararlo aquí para que no de el error CORS
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS')
+  next()
+})
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: 'https://acmeexplorerauth.firebaseio.com'
+})
 
 const routesActors = require('./src/routes/actor.routes')
 const routesTrips = require('./src/routes/trip.routes')
@@ -21,10 +36,19 @@ const routesTrips = require('./src/routes/trip.routes')
 const routesApplications = require('./src/routes/application.routes')
 const routesFinders = require('./src/routes/finder.routes')
 
+const routesDashboard = require('./src/routes/dashboard.routes')
+const routesConfig = require('./src/routes/config.routes')
+
+const routesLogin = require('./src/routes/loginRoutes')
+
+
 routesActors(app)
 routesTrips(app)
 routesFinders(app)
 routesApplications(app)
+routesDashboard(app)
+routesConfig(app)
+routesLogin(app)
 //routesOrders(app)
 //routesStorage(app)
 

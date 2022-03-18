@@ -11,7 +11,8 @@ const ApplicationSchema = new Schema({
     comment: [String],
     explorer: { type: Schema.Types.ObjectId, ref: 'Actor' },
     trip: { type: Schema.Types.ObjectId, ref: 'Trip' },
+    isDeleted: { type: Boolean, default: false },
 });
-
+ApplicationSchema.index({status:1});
 
 module.exports = mongoose.model('Applications', ApplicationSchema);

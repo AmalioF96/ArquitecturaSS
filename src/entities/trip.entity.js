@@ -2,6 +2,8 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
+const Application = mongoose.model('Applications')
+
 const customAlphabet = require('nanoid').customAlphabet
 const rand_letters = customAlphabet('ABCDEFGHIJKLMNPQRSTUVWXYZ', 4)
 
@@ -47,7 +49,15 @@ TripSchema.pre('findOneAndUpdate', function (callback) {
     if (!updatedTrip.reasonCancel || !updatedTrip.reasonCancel.replace(/\s/g, "") ) {
       return callback('A cancellation reason is needed')
     } else {
-      callback()
+      Application.findOne({ trip: this._conditions._id, status: "ACCEPTED" }, function (err, application) {
+        if (err) {
+          return callback(res)
+        } else if (!application) {
+          callback()
+        } else {
+          return callback('Cannot cancel with accepted applications')
+        }
+      })
     }
   } else {
     console.log("Updating trip")
@@ -57,7 +67,6 @@ TripSchema.pre('findOneAndUpdate', function (callback) {
       return callback('The start date must be before the end date')
     } else {
       updatedTrip.price = priceComputing(updatedTrip.stages)
-      console.log(updatedTrip)
       callback()
     }
   }
