@@ -67,9 +67,7 @@ module.exports = function (app) {
 
   app.route('/v2/actors/:actorId')
     .get(authController.verifyUser(['ADMINISTRATOR', 'EXPLORER', 'MANAGER']), actors.read_an_actor)
-    .put(
-      authController.verifyUser(['ADMINISTRATOR', 'EXPLORER', 'MANAGER']),
-     actors.update_a_verified_actor)
+    .put(authController.verifyUser(['ADMINISTRATOR', 'EXPLORER', 'MANAGER']), actors.update_a_verified_actor)
     .delete(authController.verifyUser(['ADMINISTRATOR', 'EXPLORER', 'MANAGER']), actors.delete_a_verified_actor)
 
   app.route('/v2/actors/:actorId/ban')
