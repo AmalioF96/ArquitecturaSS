@@ -56,11 +56,11 @@ exports.verifyUser = function (requiredRoles) {
           for (let i = 0; i < requiredRoles.length; i++) {
             for (let j = 0; j < actor.role.length; j++) {
               if (requiredRoles[i] === actor.role[j]) {
-                if (requiredRoles[i] === 'CLERK') {
-                  if (actor.validated === true) isAuth = true
-                } else {
-                  isAuth = true
-                }
+                // if (requiredRoles[i] === 'CLERK') {
+                //   if (actor.validated === true) isAuth = true
+                // } else {
+                isAuth = true
+                // }
               }
             }
           }
