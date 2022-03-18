@@ -7,6 +7,9 @@ module.exports = function (app) {
         .get(trips.list_all_trips)
         .post(trips.create_a_trip)
 
+    app.route('/v2/mytrips')
+        .get(authController.verifyUser(['MANAGER']), trips.list_my_trips)
+
     app.route('/v2/trips')
         .get(trips.list_all_trips)
         .post(authController.verifyUser(['MANAGER']), trips.create_a_trip_verified)

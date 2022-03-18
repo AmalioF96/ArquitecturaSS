@@ -15,8 +15,13 @@ exports.list_all_trips = function (req, res) {
   })
 }
 
-exports.list_my_trips = function (req, res) {
-  Trip.find({ isDeleted: false }, function (err, trips) {
+//v2
+exports.list_my_trips = async function (req, res) {
+  const idToken = req.headers.idtoken
+  console.log('idToken: ' + idToken)
+  const managerId = await authController.getUserId(idToken)
+  console.log('managerId: ' + managerId)
+  Trip.find({ isDeleted: false, manager: managerId }, function (err, trips) {
     if (err) {
       res.send(err)
     } else {
