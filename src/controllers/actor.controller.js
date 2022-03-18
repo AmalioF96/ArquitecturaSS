@@ -183,6 +183,8 @@ exports.update_an_actor = function (req, res) {
 
 //v2
 exports.update_a_verified_actor = function (req, res) {
+  console.log(req.params.actorId)
+  console.log(req)
   Actor.findById(req.params.actorId, async function (err, actor) {
     if (err) {
       res.send(err)

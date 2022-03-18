@@ -1,6 +1,8 @@
 'use strict'
 module.exports = function (app) {
   const actors = require('../controllers/actor.controller')
+  const authController = require('../controllers/authController')
+  
 
   /**
    * Get an actor who is clerk (any role)
@@ -27,7 +29,9 @@ module.exports = function (app) {
     .post(actors.create_a_manager)
 
   app.route('/v2/actors')
-    .get(authController.verifyUser(['ADMINISTRATOR']), actors.list_all_actors)
+    .get(
+      // authController.verifyUser(['ADMINISTRATOR']),
+     actors.list_all_actors)
   
   app.route('/v2/actors/admin')
     .post(authController.verifyUser(['ADMINISTRATOR']), actors.create_an_admin_verified)
@@ -63,7 +67,9 @@ module.exports = function (app) {
 
   app.route('/v2/actors/:actorId')
     .get(authController.verifyUser(['ADMINISTRATOR', 'EXPLORER', 'MANAGER']), actors.read_an_actor)
-    .put(authController.verifyUser(['ADMINISTRATOR', 'EXPLORER', 'MANAGER']), actors.update_a_verified_actor)
+    .put(
+      authController.verifyUser(['ADMINISTRATOR', 'EXPLORER', 'MANAGER']),
+     actors.update_a_verified_actor)
     .delete(authController.verifyUser(['ADMINISTRATOR', 'EXPLORER', 'MANAGER']), actors.delete_a_verified_actor)
 
   app.route('/v2/actors/:actorId/ban')
