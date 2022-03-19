@@ -1,6 +1,7 @@
 "use strict";
 module.exports = function (app) {
   const finders = require("../controllers/finder.controller");
+  const authController = require('../controllers/authController');
 
   /**
    * Get an finder
@@ -38,4 +39,14 @@ module.exports = function (app) {
    * 
    */
   app.route("/v1/finders/findTrip").post(finders.find_trips);
+
+  
+  /**
+   * @section finders
+   * @type post
+   * @url /v2/finders/findTrip
+   * 
+   */
+  app.route("/v2/finders/findTrip")
+     .post(authController.verifyUser(['EXPLORER']), finders.find_trips);
 };
