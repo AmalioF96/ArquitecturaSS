@@ -147,8 +147,9 @@ exports.create_a_manager_verified = function (req, res) {
 exports.read_an_actor = function (req, res) {
   Actor.findById(req.params.actorId, function (err, actor) {
     if (err) {
-      res.send(err)
+      res.status(500).send(err)
     } else {
+      actor.password='----'
       res.json(actor)
     }
   })
@@ -183,8 +184,8 @@ exports.update_an_actor = function (req, res) {
 
 //v2
 exports.update_a_verified_actor = function (req, res) {
-  console.log(req.params.actorId)
-  console.log(req)
+  const oldRole = req.body.role
+  console.log(oldRole)
   Actor.findById(req.params.actorId, async function (err, actor) {
     if (err) {
       res.send(err)
@@ -193,21 +194,23 @@ exports.update_a_verified_actor = function (req, res) {
       const idToken = req.headers.idtoken 
       // Si es manager o explorer se comprueba que el que se edita
       // es el que ha iniciado sesión
+      req.body.email = actor.email
       if (actor.role.includes('MANAGER') || actor.role.includes('EXPLORER')) { 
         const authenticatedUserId = await authController.getUserId(idToken)
 
-        if (authenticatedUserId == req.params.actorId) {
-          Actor.findOneAndUpdate({ _id: req.params.actorId }, req.body, { new: true }, function (err, actor) {
-            if (err) {
-              res.send(err)
-            } else {
-              res.json(actor)
-            }
-          })
-        } else {
-          res.status(403) // Auth error
-          res.send('Está intentando editar un actor que no es usted.')
-        }
+        req.body.role = actor.role
+          if (authenticatedUserId == req.params.actorId) {
+            Actor.findOneAndUpdate({ _id: req.params.actorId }, req.body, { new: true }, function (err, actor) {
+              if (err) {
+                res.send(err)
+              } else {
+                res.json(actor)
+              }
+            })
+          } else {
+            res.status(403) // Auth error
+            res.send('Está intentando editar un actor que no es usted.')
+          }
       } else if (actor.role.includes('ADMINISTRATOR')) {
         Actor.findOneAndUpdate({ _id: req.params.actorId }, req.body, { new: true }, function (err, actor) {
           if (err) {
@@ -288,7 +291,7 @@ exports.delete_an_actor = function (req, res) {
     }
 
   exports.ban_an_actor = function (req, res) {
-
+    console.log('Baneando')
 
     Actor.findById(req.params.actorId, function (err, oldActor) {
       if (err) {
