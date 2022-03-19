@@ -171,5 +171,16 @@ describe("Finder API", () => {
           done();
         });
     });
+    it("Trying to DELETE and get an error", (done) => {
+      const testId = "-1";
+
+      chai
+        .request(app)
+        .delete("/v1/finders/" + testId)
+        .end((err, res) => {
+          expect(res).to.have.status(500);
+          done();
+        });
+    });
   });
 });
