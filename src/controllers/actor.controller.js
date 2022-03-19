@@ -149,6 +149,7 @@ exports.read_an_actor = function (req, res) {
     if (err) {
       res.send(err)
     } else {
+      actor.password='----'
       res.json(actor)
     }
   })
@@ -193,6 +194,7 @@ exports.update_a_verified_actor = function (req, res) {
       const idToken = req.headers.idtoken 
       // Si es manager o explorer se comprueba que el que se edita
       // es el que ha iniciado sesión
+      req.body.email = actor.email
       if (actor.role.includes('MANAGER') || actor.role.includes('EXPLORER')) { 
         const authenticatedUserId = await authController.getUserId(idToken)
 
