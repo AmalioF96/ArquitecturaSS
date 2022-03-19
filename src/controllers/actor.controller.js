@@ -147,7 +147,7 @@ exports.create_a_manager_verified = function (req, res) {
 exports.read_an_actor = function (req, res) {
   Actor.findById(req.params.actorId, function (err, actor) {
     if (err) {
-      res.send(err)
+      res.status(500).send(err)
     } else {
       actor.password='----'
       res.json(actor)
@@ -291,7 +291,7 @@ exports.delete_an_actor = function (req, res) {
     }
 
   exports.ban_an_actor = function (req, res) {
-
+    console.log('Baneando')
 
     Actor.findById(req.params.actorId, function (err, oldActor) {
       if (err) {
