@@ -94,7 +94,7 @@ exports.find_trips = function (req, res) {
         ),
       },
     };
-    console.log(consulta_cache);
+    //console.log(consulta_cache);
     //Check request parameters
     var valid_query = false;
 
@@ -128,7 +128,7 @@ exports.find_trips = function (req, res) {
       Finder.findOne(consulta_cache)
         .sort({ searchTime: -1 })
         .exec(function (err, finder) {
-          console.log(finder);
+          //console.log(finder);
 
           if (err) {
             res.status(500).send(err);
@@ -146,6 +146,9 @@ exports.find_trips = function (req, res) {
                   },
                   {
                     title: { $regex: req.body.keyword, $options: "i" },
+                  },
+                  {
+                    ticker: { $regex: req.body.keyword, $options: "i" },
                   },
                 ],
               });
@@ -173,7 +176,7 @@ exports.find_trips = function (req, res) {
             }
 
             Trip.find(consulta_trips, function (err, viajes) {
-              console.log(viajes);
+              //console.log(viajes);
               if (err) {
                 res.status(500).send(err);
               } else {
@@ -183,7 +186,7 @@ exports.find_trips = function (req, res) {
                   trips: viajes,
                 });
 
-                console.info(newFinder);
+               // console.info(newFinder);
                 newFinder.save(function (err, finder) {
                   if (err) {
                     if (err.name === "ValidationError") {
