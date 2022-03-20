@@ -109,23 +109,31 @@ exports.read_a_trip = function (req, res) {
 }
 
 exports.update_a_trip = function (req, res) {
-  Trip.findOneAndUpdate({ _id: req.params.tripId }, req.body, { new: true }, function (err, trip) {
+  Trip.findById(req.params.tripId, async function (err, trip) {
     if (err) {
-      if (err.name === 'ValidationError') {
-        res.status(422).send(err)
-      } else {
-        res.status(500).send(err)
-      }
+      res.send(err)
     } else if (!trip) {
       res.status(404).send('Non existing trip')
     } else if (!trip.draftMode) {
       res.status(403).send('You cannot update a published trip')
     }
     else {
-      res.json(trip)
+      Trip.findOneAndUpdate({ _id: req.params.tripId }, req.body, { new: true }, function (err, trip) {
+        if (err) {
+          if (err.name === 'ValidationError') {
+            res.status(422).send(err)
+          } else {
+            res.status(500).send(err)
+          }
+        } else if (!trip) {
+          res.status(404).send('Non existing trip')
+        }
+        else {
+          res.json(trip)
+        }
+      })
     }
   })
-
 }
 
 //v2
@@ -174,6 +182,9 @@ exports.cancel_a_trip = function (req, res) {
     if (err) {
       res.status(500).send(err)
     }
+    else if (!trip) {
+      res.status(404).send('Non existing trip')
+    }
     else if (!(new Date(trip.dateStart) > new Date)) {
       res.status(403).send('Cannot cancel already started trips')
     }
@@ -186,8 +197,8 @@ exports.cancel_a_trip = function (req, res) {
             res.status(403).send(err)
           } else if (err === 'Cannot cancel with accepted applications') {
             res.status(403).send(err)
-          } else if (!trip) {
-            res.status(404).send('Non existing trip')
+          } else {
+            res.status(500).send(err)
           }
         } else if (!trip) {
           res.status(404).send('Non existing trip')
