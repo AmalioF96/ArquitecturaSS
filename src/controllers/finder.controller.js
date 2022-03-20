@@ -82,9 +82,12 @@ const Config = mongoose.model("Configs");
  * @param {*} res
  */
 exports.find_trips = function (req, res) {
+
+  var limit = 10;
   Config.findOne(function (err, config) {
-    
     //Set the basic values of the query
+
+    limit = config.finderLimit;
     var consulta_cache = {
       explorer: ObjectId(req.body.explorer),
 
@@ -124,7 +127,6 @@ exports.find_trips = function (req, res) {
     } else if (!valid_query) {
       res.status(400).send("Debe introducir algun parametro de entrada");
     } else {
-
       Finder.findOne(consulta_cache)
         .sort({ searchTime: -1 })
         .exec(function (err, finder) {
@@ -175,31 +177,35 @@ exports.find_trips = function (req, res) {
               });
             }
 
-            Trip.find(consulta_trips, function (err, viajes) {
-              //console.log(viajes);
-              if (err) {
-                res.status(500).send(err);
-              } else {
-                const newFinder = new Finder({
-                  ...req.body,
-                  searchTime: new Date(),
-                  trips: viajes,
-                });
 
-               // console.info(newFinder);
-                newFinder.save(function (err, finder) {
-                  if (err) {
-                    if (err.name === "ValidationError") {
-                      res.status(422).send(err);
+            Trip.find(consulta_trips)
+              .limit(limit)
+              .lean()
+              .exec(function (err, viajes) {
+                //console.log(viajes);
+                if (err) {
+                  res.status(500).send(err);
+                } else {
+                  const newFinder = new Finder({
+                    ...req.body,
+                    searchTime: new Date(),
+                    trips: viajes,
+                  });
+
+                  // console.info(newFinder);
+                  newFinder.save(function (err, finder) {
+                    if (err) {
+                      if (err.name === "ValidationError") {
+                        res.status(422).send(err);
+                      } else {
+                        res.status(500).send(err);
+                      }
                     } else {
-                      res.status(500).send(err);
+                      res.status(201).json(finder);
                     }
-                  } else {
-                    res.status(201).json(finder);
-                  }
-                });
-              }
-            });
+                  });
+                }
+              });
           } else {
             res.status(200).json(finder);
           }
