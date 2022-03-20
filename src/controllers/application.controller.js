@@ -15,6 +15,18 @@ exports.list_all_applications = function (req, res) {
   })
 }
 
+
+exports.get_grouped_status = function (req, res) {
+  const actorId = req.body.id
+  Application.find({explorer: actorId}, null, {sort: {status: 1}}, function (err, applications) {
+    if (err) {
+      res.status(500).send(err)
+    } else {
+      res.status(200).json(applications)
+    }
+  })
+}
+
 exports.create_an_application = function (req, res) {
   const newApplication = new Application(req.body)
   newApplication.save(function (err, application) {
@@ -158,6 +170,30 @@ exports.pay_an_application = function (req, res) {
           res.status(400).send('The application status should be DUE')
         } else {
           Application.findOneAndUpdate({ _id: req.params.applicationId }, { status: "ACCEPTED" }, { new: true }, (err, applicationUpdated) => {
+            if (err) {
+              res.status(500).send(err)
+            } else {
+              res.status(200).json(applicationUpdated)
+            }
+          })
+        }
+      }
+    }
+  })
+}
+
+exports.cancel_an_application = function (req, res) {
+  Application.findById(req.params.applicationId, function (err, application) {
+    if (err) {
+      res.status(500).send(err)
+    } else {
+      if (!application){
+        res.status(404).send('Non existing application')
+      }else{
+        if ( application.status != 'PENDING' && application.status != 'ACCEPTED'){
+          res.status(400).send('The application status should be PENDING o ACCEPTED')
+        } else {
+          Application.findOneAndUpdate({ _id: req.params.applicationId }, { status: "CANCELLED" }, { new: true }, (err, applicationUpdated) => {
             if (err) {
               res.status(500).send(err)
             } else {

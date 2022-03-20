@@ -17,8 +17,6 @@ exports.list_all_finders = function (req, res) {
 exports.create_an_finder = function (req, res) {
   const newFinder = new Finder({ ...req.body, searchTime: new Date() });
 
-  console.info(newFinder);
-
   newFinder.save(function (err, finder) {
     if (err) {
       if (err.name === "ValidationError") {
@@ -63,7 +61,6 @@ exports.update_an_finder = function (req, res) {
 
 exports.delete_an_finder = function (req, res) {
   Finder.deleteOne({ _id: req.params.finderId }, function (err, finder) {
-    console.log(finder);
     if (err) {
       if (err.name === "ValidationError") {
         res.status(422).send(err);
@@ -81,17 +78,12 @@ exports.delete_an_finder = function (req, res) {
 const Trip = mongoose.model("Trips");
 const Config = mongoose.model("Configs");
 /**
- * TODO Mensajes de error. Guardar los trips en finder.
  * @param {*} req
  * @param {*} res
  */
 exports.find_trips = function (req, res) {
   Config.findOne(function (err, config) {
-    console.log(config);
-
-    console.log(config.finderCache);
-    console.log(config.finderResults);
-
+    
     //Set the basic values of the query
     var consulta_cache = {
       explorer: ObjectId(req.body.explorer),
@@ -102,7 +94,7 @@ exports.find_trips = function (req, res) {
         ),
       },
     };
-    console.log(consulta_cache);
+    //console.log(consulta_cache);
     //Check request parameters
     var valid_query = false;
 
@@ -127,29 +119,20 @@ exports.find_trips = function (req, res) {
       valid_query = true;
     }
 
-    console.log("");
-    console.log("QUERY: ");
-    console.log(consulta_cache);
-    console.log("Valid? --> " + valid_query);
-
     if (err) {
       res.status(500).send(err);
     } else if (!valid_query) {
-      //TODO Cambiar mensaje de error
-      res.status(500).send("Debe introducir algun parametro de entrada");
+      res.status(400).send("Debe introducir algun parametro de entrada");
     } else {
-      console.log("");
-      console.log("Searching finders...");
 
       Finder.findOne(consulta_cache)
         .sort({ searchTime: -1 })
         .exec(function (err, finder) {
-          console.log(finder);
+          //console.log(finder);
 
           if (err) {
             res.status(500).send(err);
           } else if (!finder) {
-            console.log("SEARCHING TRIPS...\n\n\n");
             // Prepare trip search
             var consulta_trips = {
               $and: [],
@@ -163,6 +146,9 @@ exports.find_trips = function (req, res) {
                   },
                   {
                     title: { $regex: req.body.keyword, $options: "i" },
+                  },
+                  {
+                    ticker: { $regex: req.body.keyword, $options: "i" },
                   },
                 ],
               });
@@ -189,14 +175,8 @@ exports.find_trips = function (req, res) {
               });
             }
 
-            console.log("############");
-            console.log(consulta_trips);
-            console.log(JSON.stringify(consulta_trips));
-            console.log("---------------");
-
             Trip.find(consulta_trips, function (err, viajes) {
-              console.log(viajes);
-              //TODO sino encuentra ningún viaje guardo la lista vacía?
+              //console.log(viajes);
               if (err) {
                 res.status(500).send(err);
               } else {
@@ -206,7 +186,7 @@ exports.find_trips = function (req, res) {
                   trips: viajes,
                 });
 
-                console.info(newFinder);
+               // console.info(newFinder);
                 newFinder.save(function (err, finder) {
                   if (err) {
                     if (err.name === "ValidationError") {
