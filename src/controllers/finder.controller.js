@@ -76,14 +76,15 @@ exports.delete_an_finder = function (req, res) {
 };
 
 const Trip = mongoose.model("Trips");
+const authController = require('./authController');
 const Config = mongoose.model("Configs");
 /**
  * @param {*} req
  * @param {*} res
  */
 exports.find_trips = function async (req, res) {
-  const idToken = req.headers.idtoken
-  const explorerId = await authController.getUserId(idToken)
+  const idToken = req.headers.idtoken;
+  const explorerId = await authController.getUserId(idToken);
   //console.log('idToken: ' + idToken)
   console.log('explorer: ' + explorerId)
 
