@@ -14,7 +14,7 @@ exports.list_all_actors = function (req, res) {
   }
   */
   // Adapt to find the actors with the specified role
-  Actor.find({}, function (err, actors) {
+  Actor.find({'isDeleted':false}, function (err, actors) {
     if (err) {
       res.send(err)
     } else {
