@@ -82,12 +82,11 @@ const Config = mongoose.model("Configs");
  * @param {*} res
  */
 exports.find_trips = function (req, res) {
-
   var limit = 10;
   Config.findOne(function (err, config) {
     //Set the basic values of the query
 
-    limit = config.finderLimit;
+    limit = config.finderResults;
     var consulta_cache = {
       explorer: ObjectId(req.body.explorer),
 
@@ -99,33 +98,41 @@ exports.find_trips = function (req, res) {
     };
     //console.log(consulta_cache);
     //Check request parameters
-    var valid_query = false;
+    var noParameters = true;
 
     if (req.body.keyword) {
       consulta_cache["keyword"] = req.body.keyword;
-      valid_query = true;
+      noParameters = false;
+    } else {
+      consulta_cache["keyword"] = null;
     }
     if (req.body.priceMin) {
       consulta_cache["priceMin"] = req.body.priceMin;
-      valid_query = true;
+      noParameters = false;
+    } else {
+      consulta_cache["priceMin"] = null;
     }
     if (req.body.priceMax) {
       consulta_cache["priceMax"] = req.body.priceMax;
-      valid_query = true;
+      noParameters = false;
+    } else {
+      consulta_cache["priceMax"] = null;
     }
     if (req.body.dateStart) {
       consulta_cache["dateStart"] = req.body.dateStart;
-      valid_query = true;
+      noParameters = false;
+    } else {
+      consulta_cache["dateStart"] = null;
     }
     if (req.body.dateEnd) {
       consulta_cache["dateEnd"] = req.body.dateEnd;
-      valid_query = true;
+      noParameters = false;
+    } else {
+      consulta_cache["dateEnd"] = null;
     }
 
     if (err) {
       res.status(500).send(err);
-    } else if (!valid_query) {
-      res.status(400).send("Debe introducir algun parametro de entrada");
     } else {
       Finder.findOne(consulta_cache)
         .sort({ searchTime: -1 })
@@ -155,7 +162,6 @@ exports.find_trips = function (req, res) {
                 ],
               });
             }
-
             if (req.body.priceMin) {
               consulta_trips["$and"].push({
                 price: { $gte: req.body.priceMin },
@@ -176,8 +182,9 @@ exports.find_trips = function (req, res) {
                 dateEnd: { $lte: req.body.dateEnd },
               });
             }
-
-
+            if (noParameters) {
+              consulta_trips = {};
+            }
             Trip.find(consulta_trips)
               .limit(limit)
               .lean()
