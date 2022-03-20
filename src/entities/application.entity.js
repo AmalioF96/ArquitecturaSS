@@ -4,7 +4,7 @@ const Schema = mongoose.Schema
 
 const ApplicationSchema = new Schema({
     moment: {type: Date, required: true, default: Date.now },
-    status: { type: String, required: true, enum: ['PENDING', 'ACCEPTED', 'REJECTED', 'DUE'], default: 'PENDING' },
+    status: { type: String, required: true, enum: ['PENDING', 'ACCEPTED', 'REJECTED', 'DUE', 'CANCELLED'], default: 'PENDING' },
     rejectedReason: String,
     isPaid: { type: Boolean, default: false },
     ticker: { type: String, required: true },
