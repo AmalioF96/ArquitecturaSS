@@ -77,15 +77,6 @@ describe("Finder API", () => {
         });
     });
 
-    it("Trying to POST a Finder and get an error", (done) => {
-      chai
-        .request(app)
-        .post("/v1/finders/findTrip")
-        .end((err, res) => {
-          expect(res).to.have.status(400);
-          done();
-        });
-    });
   });
 
   /**
