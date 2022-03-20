@@ -76,19 +76,25 @@ exports.delete_an_finder = function (req, res) {
 };
 
 const Trip = mongoose.model("Trips");
+const authController = require('./authController')
 const Config = mongoose.model("Configs");
 /**
  * @param {*} req
  * @param {*} res
  */
-exports.find_trips = function (req, res) {
+exports.find_trips = async function (req, res) {
+  const idToken = req.headers.idtoken
+  const explorerId = await authController.getUserId(idToken)
+  //console.log('idToken: ' + idToken)
+  console.log('explorer: ' + explorerId)
+
   var limit = 10;
   Config.findOne(function (err, config) {
     //Set the basic values of the query
 
     limit = config.finderResults;
     var consulta_cache = {
-      explorer: ObjectId(req.body.explorer),
+      explorer: explorerId,
 
       searchTime: {
         $gte: new Date(
