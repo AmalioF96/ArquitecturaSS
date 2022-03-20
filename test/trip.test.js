@@ -147,7 +147,7 @@ describe("Trips API", () => {
                 });
         });
 
-        it("Trying to GET a trip - Error 404", (done) => {
+        it("Trying to GET a trip - Non existing trip", (done) => {
             chai
                 .request(app)
                 .get("/v1/trips/" + tripIdInv)
@@ -157,6 +157,29 @@ describe("Trips API", () => {
                 });
         });
     });
+
+    /**
+     * TEST SEARCH trips
+     */
+    describe("SEARCH /v1/trips", () => {
+        it("Trying to get all data", (done) => {
+            const query = {
+                text: "velada",
+                startFrom: 0,
+                pageSize: 0
+            };
+            chai
+                .request(app)
+                .get("/v1/trips/search")
+                .query(query)
+                .end((err, res) => {
+                    expect(res).to.have.status(200);
+                    expect(res.body).to.be.a("array");
+                    done();
+                });
+        });
+    });
+
 
     /**
    * Test PUT trip
@@ -253,7 +276,7 @@ describe("Trips API", () => {
                 });
         });
 
-        it("Trying to PUT a trip manually - Error 404", (done) => {
+        it("Trying to PUT a trip manually - Non existing trip", (done) => {
             const updatedTrip = {
                 title: "Velada en la playa de Marbella",
                 description: "Maravillosa velada en la premiada playa de Marbella",
@@ -283,7 +306,7 @@ describe("Trips API", () => {
                 });
         });
 
-        it("Trying to PUT the second trip manually - Error 403", (done) => {
+        it("Trying to PUT the second trip manually - Published trip", (done) => {
             chai
                 .request(app)
                 .put("/v1/trips/" + tripIdPub)
@@ -297,7 +320,7 @@ describe("Trips API", () => {
     /**
     * Test PATCH trip
     */
-    describe("PATCH /v1/trips/:id", () => {
+    describe("PATCH/CANCEL /v1/trips/:id", () => {
         it("Trying to cancel a trip", (done) => {
             const tripCancellation = {
                 reasonCancel: "Riesgo de tormenta"
@@ -312,7 +335,7 @@ describe("Trips API", () => {
                 });
         });
 
-        it("Trying to cancel a trip - 403", (done) => {
+        it("Trying to cancel a trip - Published trip", (done) => {
             chai
                 .request(app)
                 .patch("/v1/trips/" + tripIdPub)
@@ -322,7 +345,7 @@ describe("Trips API", () => {
                 });
         });
 
-        it("Trying to cancel a trip - 404", (done) => {
+        it("Trying to cancel a trip - Non existing trip", (done) => {
             chai
                 .request(app)
                 .patch("/v1/trips/" + tripIdInv)
@@ -347,7 +370,7 @@ describe("Trips API", () => {
                 });
         });
 
-        it("Trying to DELETE a trip - 403", (done) => {
+        it("Trying to DELETE a trip - Published trip", (done) => {
             chai
                 .request(app)
                 .delete("/v1/trips/" + tripIdPub)

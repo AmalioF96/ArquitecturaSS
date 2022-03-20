@@ -62,36 +62,29 @@ exports.create_a_trip_verified = async function (req, res) {
 
 
 exports.search_trips = function (req, res) {
-  const query = {}
-  query.text = req.query.text != null ? req.query.text : /.*/
+  const query = req.query.text != null ? req.query.text : /.*/
 
-  if (req.query.deleted) {
-    query.deleted = req.query.deleted
-  }
   let skip = 0
   if (req.query.startFrom) {
     skip = parseInt(req.query.startFrom)
   }
+
   let limit = 0
   if (req.query.pageSize) {
     limit = parseInt(req.query.pageSize)
   }
 
-  console.log('Query: ' + query + ' Skip:' + skip + ' Limit:' + limit)
-
-  Trip.find({ $text: { $search: query.text }, isDeleted: query.deleted }, { score: { $meta: "textScore" } })
+  Trip.find({ $text: { $search: query }}, { score: { $meta: "textScore" } })
     .sort({ score: { $meta: "textScore" } })
     .skip(skip)
     .limit(limit)
     .lean()
     .exec(function (err, trip) {
-      console.log('Start searching trips')
       if (err) {
         res.send(err)
       } else {
         res.json(trip)
       }
-      console.log('End searching trip')
     })
 }
 
