@@ -42,10 +42,8 @@ TripSchema.pre('save', function (callback) {
 TripSchema.pre('findOneAndUpdate', function (callback) {
   var updatedTrip = this._update
   if (updatedTrip.isDeleted) {
-    console.log("Deleting trip")
     callback()
   } else if (updatedTrip.isCancelled) {
-    console.log("Cancelling trip")
     if (!updatedTrip.reasonCancel || !updatedTrip.reasonCancel.replace(/\s/g, "") ) {
       return callback('A cancellation reason is needed')
     } else {
@@ -60,7 +58,6 @@ TripSchema.pre('findOneAndUpdate', function (callback) {
       })
     }
   } else {
-    console.log("Updating trip")
     if (!(new Date(updatedTrip.dateStart) > new Date)) {
       return callback('The start date must be in the future')
     } else if (!(new Date(updatedTrip.dateStart) < new Date(updatedTrip.dateEnd))) {
