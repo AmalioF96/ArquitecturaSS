@@ -14,7 +14,9 @@ const ActorSchema = new Schema({
     isBan: Boolean,
     language: { type: String, required: true, enum: ['EN', 'ES'], default: 'ES' },
     role: { type: String, required: true, enum: ['EXPLORER', 'ADMINISTRATOR', 'MANAGER'] },
-    isDeleted: { type: Boolean, default: false}
+    isDeleted: { type: Boolean, default: false},
+    customToken: { type: String },
+    idToken: { type: String}
 });
 
 ActorSchema.pre('save', function (callback) {
